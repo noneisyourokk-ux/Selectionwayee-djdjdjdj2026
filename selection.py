@@ -539,6 +539,31 @@ def main():
     
     print("🚀 Bot is running perfectly with deep PDF extractor...")
     application.run_polling()
+    
+import asyncio
+async def run_bot():
+    # 1. Bot build karo
+    application = Application.builder().token(BOT_TOKEN).build()
+    
+    # 2. Handlers add karo (yahan apne baki handlers bhi add kar dena)
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(button_handler, pattern="^(login_extract|list_batches)$"))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
+    # 3. Manual start sequence
+    print("🚀 Bot is initializing...")
+    await application.initialize()
+    await application.start()
+    
+    print("✅ Bot started successfully!")
+    await application.updater.start_polling()
+    
+    # 4. Bot ko chalu rakho
+    await asyncio.Event().wait()
 
 if __name__ == '__main__':
-    main()
+    # Event loop ke saath start karo
+    try:
+        asyncio.run(run_bot())
+    except KeyboardInterrupt:
+        print("Bot stopped.")
