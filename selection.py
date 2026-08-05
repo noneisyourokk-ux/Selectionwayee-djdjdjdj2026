@@ -1,3 +1,4 @@
+import asyncio
 import requests
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
