@@ -1,3 +1,4 @@
+import asyncio
 import requests
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -533,7 +534,21 @@ def main():
     print("🤖 Bot is running...")
     application.run_polling()
 
-if __name__ == '__main__':
+async def main():
+    application = Application.builder().token(BOT_TOKEN).build()
 
-    main()
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(button_handler, pattern="^(login_extract|list_batches)$"))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
+    print("🤖 Bot is running...")
+
+    await application.initialize()
+    await application.start()
+    await application.updater.start_polling()
+    await application.updater.idle()
+    await application.stop()
+    await application.shutdown()
+
+if __name__ == "__main__":
+    asyncio.run(main())
