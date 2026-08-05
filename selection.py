@@ -520,20 +520,25 @@ async def process_extraction_result(update, course_name, result):
             parse_mode='Markdown'
         )
 
-def main():
-    """Start the bot"""
+async def main():
     application = Application.builder().token(BOT_TOKEN).build()
-    
-    # Add handlers
+
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_handler, pattern="^(login_extract|list_batches)$"))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    
-    # Start the Bot
+
     print("🤖 Bot is running...")
-    application.run_polling()
 
-if __name__ == '__main__':
+    await application.initialize()
+    await application.start()
+    await application.updater.start_polling()
 
-    main()
+    try:
+        await asyncio.Event().wait()
+    finally:
+        await application.updater.stop()
+        await application.stop()
+        await application.shutdown()
 
+if __name__ == "__main__":
+    asyncio.run(main())
